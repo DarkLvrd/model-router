@@ -17,7 +17,7 @@
  *
  *   - switch OFF  -> this returns immediately and makes no network call
  *   - switch ON   -> one Jev call, hard-capped at JEV_TIMEOUT_MS (default
- *                    1500ms, measured warm 410-800ms), then:
+ *                    2500ms, measured warm 382-770ms), then:
  *                      - routed: setModel + helper contract, turn proceeds
  *                      - anything else: return undefined, turn proceeds
  *                        exactly as it would with no router installed

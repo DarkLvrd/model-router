@@ -165,16 +165,20 @@ probes also came back `cannot_tell` on their own — the escape hatch working.
 
 ## Never slower, never blocked
 
-Every Jev call runs under a **hard timeout of 1500ms**. No retries — a retry could
-not fit in the budget.
+Every Jev call runs under a **hard timeout of 2500ms**. No retries — a retry could
+not fit in the budget. The cap is set from measurement: 30 live calls from one
+process on 2026-09-22 gave min 382ms, median 489ms, p95 1583ms, max 4013ms. The
+2500ms cap clears p95 by ~917ms, and the previous 1500ms cap cleared a typical
+call by only ~86ms — that thin margin was silently losing messages to the
+fallback.
 
 | Situation | Added delay |
 | --------- | ----------- |
 | router OFF | **0ms.** No file read beyond one `existsSync`, no network, no Jev. |
-| router ON, Jev answers | measured **410–722ms** warm (p50 ≈ 540ms) |
-| router ON, Jev slow or broken | capped at **1500ms**, then today's behaviour |
+| router ON, Jev answers | measured **382–770ms** warm (p50 ≈ 489ms) |
+| router ON, Jev slow or broken | capped at **2500ms**, then today's behaviour |
 
-**Stated budget: up to 1800ms added per message while ON, and 0ms while OFF.**
+**Stated budget: up to 2800ms added per message while ON, and 0ms while OFF.**
 
 Anything at all goes wrong — timeout, HTTP error, 429, missing key, unparseable
 body, wrong shape, no mapped model, model lookup fails, `setModel` returns false —
@@ -184,17 +188,18 @@ write that happens before the hook returns — deferred to a later tick it could
 lost when Pi exits as soon as a turn ends, and a status that silently under-counts
 is worse than a millisecond.
 
-**About the cold start, honestly.** TypeSafe's first **two** calls from a fresh
-process are cold at ~2.0s each (measured: 2007ms, 2093ms), which is *over* the
-per-message budget on purpose — a cold call falls back rather than holding your
-turn. So that the captain's first messages don't pay it, the extension runs two
-throwaway warm-up calls once when it loads while the switch is ON. Those warm-up
-calls are real Jev calls and cost real (tiny) money. They are fire-and-forget:
-nothing waits on them, and if they fail nothing happens.
+**About the cold start, honestly.** TypeSafe's first calls from a fresh process
+can be cold — in the 30-call re-measurement on 2026-09-22 the first call took
+1583ms and the second 4013ms, both far above the 382–770ms warm band and the
+second *over* the per-message budget on purpose — a cold call falls back rather
+than holding your turn. So that the captain's first messages don't pay it, the
+extension runs two throwaway warm-up calls once when it loads while the switch is
+ON. Those warm-up calls are real Jev calls and cost real (tiny) money. They are
+fire-and-forget: nothing waits on them, and if they fail nothing happens.
 
 Because they are fire-and-forget, the **first message of a session can still lose
 the race** and fall back if the connection is not warm yet. That happened in one
-of the verification runs — the ledger shows it as `timed out after 1500ms`. It is
+of the verification runs — the ledger shows it as `timed out after 2500ms`. It is
 the safe direction: the message was answered by the default model with no switch,
 not delayed, and the next message routed normally. It is stated here rather than
 smoothed over.
@@ -238,7 +243,7 @@ model-router 1.0.0 — OFF
 
 switch file:  ~/.model-router/enabled  (exists = ON; absent = OFF)
 state file:   ~/.model-router/state.json
-latency:      worst case 1800ms added per message while ON (Jev timeout 1500ms); 0ms while OFF
+latency:      worst case 2800ms added per message while ON (Jev timeout 2500ms); 0ms while OFF
 
 messages seen: 10
 
@@ -340,7 +345,7 @@ recorded reason is the escape hatch, which is the check that ran first.
 
 The run above was made with the extension's two warm-up calls first, matching how
 the router runs in practice. An earlier run without the warm-up lost one sample to
-the 1500ms cap — that is the fallback behaving correctly, but it would have
+the 2500ms cap — that is the fallback behaving correctly, but it would have
 understated the router, so the warm-up is part of the harness.
 
 ## Verified in a real Pi session, not just in tests
@@ -375,6 +380,11 @@ Then, whenever you want it:
 ```
 model-router on
 ```
+
+The `model-router` command is on PATH through a symlink at
+`~/.local/bin/model-router` pointing at this project's `bin/router.mjs`, so
+`model-router on`, `model-router off` and `model-router status` work from any
+directory.
 
 ## Tests
 
@@ -412,7 +422,7 @@ and the helper fallbacks. None of it needs a network.
 ## Layout
 
 ```
-lib/config.mjs     endpoints, the 1500ms budget, thresholds, state paths
+lib/config.mjs     endpoints, the 2500ms budget, thresholds, state paths
 lib/sizes.mjs      the four sizes, the model mapping, and the basis for the order
 lib/jev.mjs        the sizer: one request, three questions, hard timeout, no retries
 lib/policy.mjs     the routing rule as a pure function — every veto is testable
