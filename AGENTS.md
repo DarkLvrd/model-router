@@ -5,10 +5,10 @@ This file is the project's committed home for project-intrinsic agent knowledge:
 ## Commands
 
 ```bash
-npm test                    # 58 offline tests (rule, ledger, switch, parser, failure modes)
-node test/switch-canary.mjs # asserts the router ships OFF and OFF means no network
-model-router test-samples   # the live 10-message Jev run; spends tokens, writes evidence/
-node tools/replay-evidence.mjs  # replay the last evidence run into a throwaway ledger and print status
+npm test                          # 58 offline tests (rule, ledger, switch, parser, failure modes)
+node test/switch-canary.mjs       # asserts the router ships OFF and OFF means no network
+node bin/router.mjs test-samples  # the live 10-message Jev run; spends tokens, writes evidence/
+node tools/replay-evidence.mjs    # replay the last evidence run into a throwaway ledger and print status
 ```
 
 ## Sharp edges
@@ -25,6 +25,22 @@ node tools/replay-evidence.mjs  # replay the last evidence run into a throwaway 
 - **The router ships OFF and that is load-bearing.** The switch is the existence of
   `~/.model-router/enabled`; absent means off. Never make ON the default, and never write
   state into the repository.
+
+## Install and runtime
+
+- The captain's Pi loads this extension as a user package installed by
+  `pi install /Users/mac/firstmate/projects/model-router`. That records a **path reference,
+  not a copy**, so the live extension is whatever working tree sits in the primary
+  checkout: a change living only in a worktree is not live until it reaches `main` there.
+- No `model-router` executable is on `PATH`, and `pi install` does not link package `bin`
+  entries (`bin/router.mjs` is not chmod +x either). Use `node bin/router.mjs <cmd>` in a
+  shell, and `/router` inside Pi; the variants are `on`, `off`, `reset`, bare for status.
+- **`pi list` succeeding does not prove the command exists.** `router` is registered at
+  load time by `pi.registerCommand`, so verify headlessly by driving `pi --mode rpc` and
+  sending `{"type":"get_commands"}`: the entry must carry `"origin":"package"` and the
+  installed path, not an `-e` path. RPC is the vehicle because `ctx.hasUI` is false under
+  `-p`, where `notify` is silently dropped.
+- Worked example, with exact commands and output: `evidence/install-verification.md`.
 
 ## Where things live
 
