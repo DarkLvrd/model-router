@@ -1,0 +1,5 @@
+# Runtime state: switch, counters, cost ledger. Lives outside the repo by
+# default (see lib/config.mjs) so a fresh clone starts OFF with zero counters.
+.model-router/
+node_modules/
+*.log
