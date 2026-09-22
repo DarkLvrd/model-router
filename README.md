@@ -167,10 +167,14 @@ probes also came back `cannot_tell` on their own — the escape hatch working.
 
 Every Jev call runs under a **hard timeout of 2500ms**. No retries — a retry could
 not fit in the budget. The cap is set from measurement: 30 live calls from one
-process on 2026-09-22 gave min 382ms, median 489ms, p95 1583ms, max 4013ms. The
-2500ms cap clears p95 by ~917ms, and the previous 1500ms cap cleared a typical
-call by only ~86ms — that thin margin was silently losing messages to the
-fallback.
+process on 2026-09-22 gave min 382ms, median 489ms, p95 1583ms, max 4013ms. Every
+warm call already passed under the previous 1500ms cap; what failed were the
+slower and cold calls above it — fresh-process probes of 1371ms and 1414ms, and
+the 1583ms cold call above. The 2500ms cap clears p95 by ~917ms and rescues
+everything up to 2500ms, including that 1583ms cold call, while the 4013ms cold
+call still falls back rather than holding the turn. The real cost of the raise:
+the worst-case added wait per message goes from 1800ms to 2800ms, and it is only
+paid when a call runs slow.
 
 | Situation | Added delay |
 | --------- | ----------- |
