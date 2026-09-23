@@ -9,6 +9,12 @@ Captain's brief: install the router so `/router` exists in his Pi sessions and i
 - Pi version: `0.85.1`, at `/Users/mac/.local/share/pi-node/node-v22.23.2-darwin-arm64/bin/pi`
 - Outcome: **installed, loaded, `/router` registered, OFF, left OFF.**
 
+> **Later note, added when this branch was rebased onto `main` (2026-09-22).** `main` has
+> since added the `model-router` shim at `~/.local/bin/model-router` and documents it in the
+> README install section, so the shell form in §4 now resolves. Everything below is
+> unchanged: it is the install-time record, including the `budget: 1800ms` status line that
+> predates `main`'s 2500ms timeout.
+
 ## 1. Install
 
 `pi install --help` and `pi list --help` were read before running anything. `pi install`

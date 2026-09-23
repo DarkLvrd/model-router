@@ -32,9 +32,12 @@ node tools/replay-evidence.mjs    # replay the last evidence run into a throwawa
   `pi install /Users/mac/firstmate/projects/model-router`. That records a **path reference,
   not a copy**, so the live extension is whatever working tree sits in the primary
   checkout: a change living only in a worktree is not live until it reaches `main` there.
-- No `model-router` executable is on `PATH`, and `pi install` does not link package `bin`
-  entries (`bin/router.mjs` is not chmod +x either). Use `node bin/router.mjs <cmd>` in a
-  shell, and `/router` inside Pi; the variants are `on`, `off`, `reset`, bare for status.
+- `pi install` does not link package `bin` entries and `bin/router.mjs` is not chmod +x, so
+  the machine-independent shell form is `node bin/router.mjs <cmd>`. On this machine
+  `model-router` also resolves, via the shim at `~/.local/bin/model-router` that execs the
+  same file from the primary checkout (added after this install; the README install section
+  documents it). Inside Pi the surface is `/router`; the variants are `on`, `off`, `reset`,
+  bare for status.
 - **`pi list` succeeding does not prove the command exists.** `router` is registered at
   load time by `pi.registerCommand`, so verify headlessly by driving `pi --mode rpc` and
   sending `{"type":"get_commands"}`: the entry must carry `"origin":"package"` and the
