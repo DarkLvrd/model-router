@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Canary: prove the router ships OFF and stays OFF unless the captain turns it
+ * Canary: prove the router ships OFF and stays OFF unless the user turns it
  * on, and that while it is off nothing is sent to TypeSafe.
  *
  *   node test/switch-canary.mjs
  *
  * This runs against a throwaway MODEL_ROUTER_HOME, so it never touches the
- * captain's real switch. It fails loudly if a fresh install would arrive with
+ * user's real switch. It fails loudly if a fresh install would arrive with
  * the router on, which would mean message text being sent to a third party
- * without the captain asking.
+ * without the user asking.
  */
 
 import assert from 'node:assert/strict';

@@ -1,18 +1,18 @@
 /**
  * The live test: run the 8 sample messages plus the 2 short replies through
  * the real Jev sizer, apply the real routing rule, and write out the table
- * the captain asked for plus the raw answers as evidence.
+ * the user asked for plus the raw answers as evidence.
  *
  *   node bin/router.mjs test-samples
  *   node test/run-samples.mjs
  *
  * This DOES send the sample message text to TypeSafe. It is the one place in
  * this project that talks to Jev while the switch is off, and it says so
- * before it starts. The samples are written for this repo, not the captain's
+ * before it starts. The samples are written for this repo, not the user's
  * own traffic.
  *
- * Output goes to evidence/. Nothing about the captain's real usage is touched:
- * the ledger is not written to, because these are not the captain's messages.
+ * Output goes to evidence/. Nothing about the user's real usage is touched:
+ * the ledger is not written to, because these are not the user's messages.
  */
 
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -38,7 +38,7 @@ console.log('');
 // which is over the per-message budget on purpose. Measurement showed TWO cold
 // calls (~2007ms and ~2093ms) and then everything warm at 410-797ms, so the
 // warm-up does two. The Pi extension pays the same cost once at load instead of
-// on the captain's first two messages. The warm-up's tokens are in the totals.
+// on the user's first two messages. The warm-up's tokens are in the totals.
 const warmupCalls = [];
 for (let i = 0; i < 2; i++) {
   warmupCalls.push(await sizeMessage('warm up the connection', { timeoutMs: 10_000 }));
@@ -175,7 +175,7 @@ const table = [
     'The two short replies were sent with the preceding conversation turns, which is what the "is this a standalone job?" question judges.',
   '',
   `A two-call warm-up ran first (${warmup.ok ? `ok in ${warmup.ms}ms total` : `failed: ${warmup.reason}`}) because TypeSafe's first two calls from a fresh ` +
-    'process are cold (~2.0s each, measured) and the Pi extension pays that once at load rather than on the captain\'s first messages. Those tokens are included in the totals below.',
+    'process are cold (~2.0s each, measured) and the Pi extension pays that once at load rather than on the user\'s first messages. Those tokens are included in the totals below.',
   '',
   '| # | band | message | Jev size | confidence | clear? | standalone? | mapped model | outcome |',
   '| - | ---- | ------- | -------- | ---------- | -------- | ----------- | ------------ | ------- |',
@@ -185,7 +185,7 @@ const table = [
   ),
   '',
   '`clear?` is the second, independent "is this request clear enough to act on?" signal — not the pick\'s own',
-  'confidence, which this fleet has already measured as unreliable on a forced choice.',
+  'confidence, which earlier runs already measured as unreliable on a forced choice.',
   '`standalone?` is the third question, which is what catches the two short replies.',
   '',
   '## Totals',

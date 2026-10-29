@@ -7,8 +7,8 @@
  * the 10-message test. Hand-writing that output would be a claim. This makes it
  * a reproduction — same rule, same ledger, same formatter, no Jev calls.
  *
- * It writes to a temp directory, never to the captain's real ledger, because
- * the sample messages are not the captain's messages. Every import below is
+ * It writes to a temp directory, never to the user's real ledger, because
+ * the sample messages are not the user's messages. Every import below is
  * dynamic and happens AFTER MODEL_ROUTER_HOME is set, so there is no way for
  * this tool to reach the real state directory.
  */
@@ -82,7 +82,7 @@ for (const s of raw.samples) {
 console.log(`# replayed from ${file.slice(REPO_ROOT.length + 1)}`);
 console.log('# produced by tools/replay-evidence.mjs into a throwaway state dir\n');
 
-// Print through the real CLI, so what you see is exactly what the captain sees.
+// Print through the real CLI, so what you see is exactly what the user sees.
 const { execFileSync } = await import('node:child_process');
 process.stdout.write(
   execFileSync(process.execPath, [join(REPO_ROOT, 'bin', 'router.mjs'), 'status'], {

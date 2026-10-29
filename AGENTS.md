@@ -14,22 +14,22 @@ node tools/replay-evidence.mjs    # replay the last evidence run into a throwawa
 ## Sharp edges
 
 - **A nested `pi` must not be given a piped stdin.** `execFile` always pipes stdin, and a
-  child `pi` given a pipe never starts — it sat silent until killed in every combination
+  child `pi` given a pipe never starts; it sat silent until killed in every combination
   tried. Use `spawn` with `stdio: ['ignore', 'pipe', 'pipe']`. See `spawnHelper` in
   `lib/helpers.mjs`, and `helperEnv` for the `PI_*` variables a helper must not inherit.
 - **Runtime state paths are functions, not constants.** `stateDir()` / `stateFile()` /
   `switchFile()` in `lib/config.mjs` read `MODEL_ROUTER_HOME` at call time. Anything that
   sets that env var must do so *before* importing the lib, and imports inside tools and
   tests are therefore dynamic. A module-level constant once caused a test tool to write its
-  counters into the captain's real ledger.
+  counters into the user's real ledger.
 - **The router ships OFF and that is load-bearing.** The switch is the existence of
   `~/.model-router/enabled`; absent means off. Never make ON the default, and never write
   state into the repository.
 
 ## Install and runtime
 
-- The captain's Pi loads this extension as a user package installed by
-  `pi install /Users/mac/firstmate/projects/model-router`. That records a **path reference,
+- Pi loads this extension as a user package installed with
+  `pi install /path/to/model-router`. That records a **path reference,
   not a copy**, so the live extension is whatever working tree sits in the primary
   checkout: a change living only in a worktree is not live until it reaches `main` there.
 - `pi install` does not link package `bin` entries and `bin/router.mjs` is not chmod +x, so
@@ -54,7 +54,7 @@ node tools/replay-evidence.mjs    # replay the last evidence run into a throwawa
 - Why per-message switching is automatic here (`before_agent_start` is awaited before the
   agent run, so `pi.setModel()` applies to the current turn): the header comment in
   `extensions/model-router.ts`.
-- Captain-facing behaviour, privacy and the honest limits of this design: `README.md`.
+- User-facing behaviour and privacy: `README.md`. Full design notes and measurements: `docs/DESIGN.md`.
 
 ## Maintaining this file
 

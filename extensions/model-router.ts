@@ -2,9 +2,9 @@
  * model-router — a Pi extension that sizes each message with Jev and switches
  * the session onto the smallest model that can do the job.
  *
- * ## How the captain's messages reach this
+ * ## How the user's messages reach this
  *
- * Pi emits `before_agent_start` after the captain submits a prompt and
+ * Pi emits `before_agent_start` after the user submits a prompt and
  * BEFORE it starts the agent turn. Pi awaits the hook, so anything done here
  * — including `pi.setModel()` — applies to the message being sent right now.
  * Verified in the installed Pi source: `dist/core/agent-session.js` awaits
@@ -13,7 +13,7 @@
  * That makes this genuinely automatic and genuinely per-message. It is not a
  * discipline anyone has to remember.
  *
- * ## Never slow the captain down
+ * ## Never slow the user down
  *
  *   - switch OFF  -> this returns immediately and makes no network call
  *   - switch ON   -> one Jev call, hard-capped at JEV_TIMEOUT_MS (default
@@ -68,7 +68,7 @@ export default async function modelRouterExtension(pi) {
   const { router, helpers, sw, ledger, config } = lib;
 
   // Warm the Jev connection once, only when the switch is ON, so the
-  // captain's first messages are not the ones that pay the cold-start cost.
+  // user's first messages are not the ones that pay the cold-start cost.
   // Measured: the first TWO calls from a fresh process take ~2s each, then
   // everything is warm at 410-797ms. Fire and forget — a failure here is
   // irrelevant, and nothing waits on it.
@@ -92,7 +92,7 @@ export default async function modelRouterExtension(pi) {
 
     const prompt = event?.prompt;
     if (typeof prompt !== 'string' || prompt.trim() === '') return undefined;
-    // Never route a slash command; the captain is driving, not asking.
+    // Never route a slash command; the user is driving, not asking.
     if (prompt.trimStart().startsWith('/')) return undefined;
 
     try {

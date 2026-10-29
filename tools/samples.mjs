@@ -1,5 +1,5 @@
 /**
- * The live test set: the captain's 8 sample messages, tiny through hardest,
+ * The live test set: the user's 8 sample messages, tiny through hardest,
  * plus 2 short replies that only mean something inside the running
  * conversation.
  *

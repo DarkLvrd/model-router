@@ -1,7 +1,7 @@
 /**
  * The router as a whole, offline.
  *
- * The two claims that matter most to the captain are asserted here:
+ * The two claims that matter most to the user are asserted here:
  *
  *   1. OFF makes no network call and adds nothing. (No fetch happens at all.)
  *   2. ON never blocks on a bad Jev. Every failure mode falls back, and the
