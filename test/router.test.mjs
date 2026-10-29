@@ -16,6 +16,9 @@ import test, { after } from 'node:test';
 
 const home = mkdtempSync(join(tmpdir(), 'model-router-router-'));
 process.env.MODEL_ROUTER_HOME = home;
+// A fake key so the ON tests run the same with or without a real TYPESAFE_API_KEY set.
+// Every request goes to an injected fetch, so the key never leaves the process.
+process.env.TYPESAFE_API_KEY = 'test-key';
 
 const { route } = await import('../lib/router.mjs');
 const ledger = await import('../lib/ledger.mjs');
