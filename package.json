@@ -11,7 +11,9 @@
     "model-router": "./bin/router.mjs"
   },
   "pi": {
-    "extensions": ["./extensions/model-router.ts"]
+    "extensions": [
+      "./extensions/model-router.ts"
+    ]
   },
   "scripts": {
     "router": "node ./bin/router.mjs",
@@ -19,5 +21,6 @@
     "test": "node --test test/*.test.mjs",
     "test:samples": "node ./bin/router.mjs test-samples",
     "test:canary": "node ./test/switch-canary.mjs"
-  }
+  },
+  "license": "MIT"
 }
